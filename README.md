@@ -177,72 +177,29 @@ cat ~/$projectname/subdomains/subdomains.txt | while read line ; do echo "QUIT" 
 
 #### Takeover Tool: 
 ```bash
-takeover -l sub_domains.txt -v -t 10
+takeover -l ~/$projectname/subdomains/subdomains.txt -v -t 10
 ```
  
 #### Use Smuggler
 on URLs list to test for http requests that could desync, and posting multiple chunked requests to smuggle external sources so the backend server will forward the request with cookies, data to the front end server
 
 ```bash
-cat list_of_urls.txt | python3 smuggler.py -l /root/location.txt
+cat ~/$projectname/urls/urls.txt | python3 smuggler.py -l ~/$projectname/smuggler-result.txt
 ```
-
-**Bonus**
-
-
-
-
-Examine the Results Manually
-
-
-B) Pattern Check Example for Results with gf & gf-patterns: 
-
-After you have the Parameters Gathered, we want to check for specific patterns and possible vulnerable URLs that can be attacked using Meg or other Fuzzing Tools.
-```
-cat /root/Desktop/Bounty/params.txt | gf xss | sed 's/FUZZ/ /g' >> /root/Desktop/Bounty/xss_params_forMeg.txt
-```
-
-Very Powerful One Liner - You can Pipe also directly to Meg.
-
-
-8. Use Meg with Seclist fuzzing for Links: (Gathered from gau/arjun/paramspider/gf)
-
-For Meg, we must remove the ‘FUZZ’ from paramspider and replace it with a null character:
-
-```
-sed 's/FUZZ//g' reconfile.txt
-```
-```
-meg -v LFI-gracefulsecurity-linux.txt /root/Desktop/Bounty/urls.txt /root/Desktop/urls.txt -s 200
-```
-
-
-
  
-10. Find XSS Vulnerabilities from Paramspider & Dalfox New!
-
+#### Find XSS Vulnerabilities from Paramspider & Dalfox New!
 Since we have params urls from paramspider, dalfox needs to know where to inject, and you can define it with XSS instead of FUZZ, so here is a command to replace this from the result, and create a new list to be used on dalfox.
-
+```bash
+cat ~/$projectname/params/all.txt | sed 's/FUZZ/XSS/g' > ~/$projectname/all-dalfox-ready.txt
 ```
-sed 's/FUZZ/XSS/g' reconfile.txt
-```
-
 You are now ready for parsing the urls into dalfox in pipe mode:
-
-
+```bash
+cat ~/$projectname/all-dalfox-ready.txt | dalfox pipe | cut -d " " -f 2 > ~/$projectname/dalfox-all-result.txt
 ```
-cat /root/Desktop/Bounty/xss_params.txt | dalfox pipe | cut -d " " -f 2 > output.txt
+```bash
+dalfox file ~/$projectname/all-dalfox-ready.txt | cut -d " " -f 2 > ~/$projectname/dalfox-all-result.txt
 ```
-
-or
-
-```
-dalfox file /root/Desktop/Bounty/xss_params.txt | cut -d " " -f 2 > output.txt
-```
-
-For Deeper Attacks add this:
-
---deep-domxss
+For Deeper Attacks add this: `--deep-domxss`
 
 Silence --silence Prints only PoC When found and progress
 
@@ -271,6 +228,15 @@ gitleaks --path=/file.xxx -v --no-git
 #### After Recon: New!
 
 When you find Keys/Tokens - Check from here: https://github.com/streaak/keyhacks
+
+Examine the Results Manually
+
+B) Pattern Check Example for Results with gf & gf-patterns: 
+
+After you have the Parameters Gathered, we want to check for specific patterns and possible vulnerable URLs that can be attacked using Meg or other Fuzzing Tools.
+```
+cat /root/Desktop/Bounty/params.txt | gf xss | sed 's/FUZZ/ /g' >> /root/Desktop/Bounty/xss_params_forMeg.txt
+```
 
 ********************************************************************************************************************
 
@@ -365,4 +331,3 @@ https://github.com/Black-Hat-Ethical-Hacking/log4j-scan
 https://github.com/j3ssie/osmedeus
 35) getJS
 https://github.com/003random/getJS
-
