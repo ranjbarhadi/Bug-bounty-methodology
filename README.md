@@ -1,4 +1,4 @@
-# Introduction:
+# introduction:
 What you see here is an overview of how i approach reacon.
 
 ## Roadmap:
@@ -6,9 +6,13 @@ What you see here is an overview of how i approach reacon.
 graph LR
 A((Project setup)) --> B(recon-ng)
 B --> C(isup)
-B --> D(nMap)
+C --> D(nMap)
+C --> F(Sn1per)
 B --> E(httpx)
-B --> F(Sn1per)
+E --> G(Eyewitness)
+B --> H(osmedeous)
+B --> I(Heartbleed)
+B --> J(takeover)
 ```
 
 ## Project setup
@@ -17,7 +21,7 @@ Create Folders (subdomains, urls, ips,patterns,params,javascript). here is a goo
 export projectname=[name]
 ```
 ``` bash
-mkdir $projectname && cd projectname && mkdir subdomains urls ips patterns params javascripts
+mkdir ~/$projectname && cd ~/$projectname && mkdir subdomains urls ips patterns params javascripts
 ```
 
 ## Recon
@@ -41,72 +45,107 @@ modules load recon/domai.....
 run
 
 # save the list 
+modules load reporting/list
+# save ip addresses
+options set FILENAME ~/$projectname/ips/ips.txt
+run
+# save domains
+options set COLUMN host
+options set FILENAME ~/$projectname/subdomains/subdomains.txt
+run
+```
+
+now make sure you are in your working directory:
+```bash
+cd ~/$projectname
+```
+
+#### Check if ips are alive:
+check if ips are alive using isup.
+```bash
+cd ~/isup && rm tmp -R &&./isup.sh ~/$projectname/ips/ips.txt && cp ~/isup/tmp/valid-ips.txt ~/$projectname/ips/valid-ips.txt
+```
+
+#### Validate subdomains:
+validate domains using httpx:
+```bash
+cat ~/$projectname/subdomains/subdomains.txt | httpx -verbose > ~/$projectname/urls/urls.txt
 ```
 
 #### Use Nmap Aggressive Scan:
 ```bash
-nmap -iL ips.txt -sSV -A -T4 -O -Pn -v -F -oX $projectname_nmap_result.xml
+nmap -iL ~/$projectname/ips/valid-ips.txt -sSV -A -T4 -O -Pn -v -F -oX $projectname_nmap_result.xml
 ```
 #### Sn1per - WebApp Mode: 
 ```bash
-sniper -f $projectname/ips/ips.txt -m massweb -w $projectname
+sniper -f ~/$projectname/ips/ips.txt -m massweb -w $projectname
+```
+then save the result and copy them to our working folder!
+```bash
+# complete this
 ```
 
-Then Run subdomains using httpx for urls
-
-Use updog to offer easier workflow when uploading/checking directories locally.
-
-For example when using a raspberry pi, or VPS it helps uploading files locally on the machine.
-
-********************************************************************************************************************
-
-
-
-
-
-
-**UPLOAD ALL RESULTS INTO PLATFORM**
-
-Examine Some Services Manually from the Cloud Platform Hive: New!
-
-Use Metasploit + Searchsploit to manually search - note down certain areas of interest including Log4j Patterns.
-
-This could take days/weeks - So, its a non stop process.
-
-5b. Extra Osmedeus Scan New!
-
-You can use on the list of IP addresses, a domain or list of URLs gathered Osemedeus with UI to go for more in depth recon/attacks on CVEs:
-
-osmedeus server
-
-for the UI 
-
-## Directly run on vuln scan and directory scan on list of domains 
+#### Eyewitness to take Screenshots of all URLS
+```bash
+cd ~/$projectname/ && eyewitness -f ~/$projectname/urls/urls.txt
 ```
-osmedeus scan -f vuln-and-dirb -t list-of-domains.txt
+```bash
+zip -r $projectname.zip foldername
 ```
 
-## Scan list of targets 
+#### Nuclei
+for scanning everything:
+```bash
+nuclei -l ~/$projectname/urls/urls.txt -o ~/$projectname/nucleai_cve_result.txt
 ```
-osmedeus scan -T list_of_targets.txt
+for cve only:
+```bash
+nuclei -l ~/$projectname/urls/urls.txt -t /root/nuclei-templates/cves/ -o ~/$projectname/nucleai-cve-result.txt
 ```
 
-## Get target from a stdin and start the scan with 2 concurrency 
-```
-cat list_of_targets.txt | osmedeus scan -c 2
+#### Jaeles:
+```bash
+cat ~/$projectname/urls/urls.txt | jaeles scan -s 'cves' -s 'sensitive' -s 'fuzz' -s ‘common' -s 'routines' report -o ~/$projectname/Jaeles-cve-result.txt --title "[$projectname] Jaeles Full Report"
 ```
 
-## Start a simple scan with default 'general' flow 
+#### chopchop 
+
+```bash
+~/ChopChop/gochopchop scan --url-file ~/$projectname/urls/urls.txt --threads 4 -e csv --export-filename ~/$projectname/chopchop-result.txt
 ```
+
+#### inception
+```bash
+# write this
+```
+
+#### use osmedeous to search for vulenerablities: 
+Select one of these actions
+directly run on vuln scan and directory scan on list of domains :
+```bash
+osmedeus scan -f vuln-and-dirb -t ~/$projectname/subdomains/subdomains.txt
+```
+scan list of targets :
+```bash
+osmedeus scan -T ~/$projectname/subdomains/subdomains.txt
+```
+get target from a stdin and start the scan with 2 concurrency :
+```bash
+cat ~/$projectname/subdomains/subdomains.txt | osmedeus scan -c 2
+```
+start a simple scan with default 'general' flow :
+```bash
 osmedeus scan -t sample.com
 ```
-
-One Liner Very Powerful Techniques New! 
-
-Check for Heartbleed:
-
+then save the result and copy them to our working folder!
+```bash
+# complete this
 ```
-cat subdomains.txt | while read line ; do echo "QUIT" | openssl s_client -connect $line:443 2>&1 | grep 'server extension "heartbeat" (id=15)' || echo $line: safe; done
+
+#### Check for Heartbleed:
+
+```bash
+cat ~/$projectname/subdomains/subdomains.txt | while read line ; do echo "QUIT" | openssl s_client -connect $line:443 2>&1 | grep 'server extension "heartbeat" (id=15)' || echo $line: safe; done
 ```
 
 Extract Javascripts from domains, and fetch only the URLS from those big files, can also be used with any type of file containing huge data:
@@ -175,15 +214,8 @@ cat list_of_urls.txt | python3 smuggler.py -l /root/location.txt
 
 **Bonus**
 
-A) Eyewitness to take Screenshots of all URLS, Will run on VPS only! New!
 
-```
-eyewitness -f /root/Desktop/Bounty/Client/urls.txt
-```
 
-```
-zip -r name.zip folder
-```
 
 Examine the Results Manually
 
@@ -277,38 +309,8 @@ Perform OSINT using spiderfoot
 
 One off 1337 Powerful Command Attacks with amass:
 
-#### 1. Nuclei:
-```
-amass enum -passive -d [subdomain] -v | httpx -verbose | nuclei -t /root/nuclei-templates/cves/ -o /root/Desktop/Bounty/location.txt
-```
 
-#### 2. Jaeles:
-```
-amass enum -passive -d [Domain] -v | httpx -verbose | jaeles scan -s 'cves' -s 'sensitive' -s 'fuzz' -s ‘common' -s 'routines' report -o /root/Desktop/Bounty/reportname.txt --title "[Client] Jaeles Full Report"
-```
 
-3. Use Eyewitness to take screenshots from URLs
-
-```
-eyewitness -f /root/Desktop/Bounty/Client/urls.txt
-```
-
-#### More Tools: `chopchop` / `inception` / `jsql`
-
-```
-./gochopchop scan --url-file /root/Desktop/Bounty/urls.txt --threads 4
-```
-
-#### Sn1per - Bounty Mode on Active Results
-
-```
-sniper -f /root/Desktop/Bounty/Airbnb/ips/valid-airbnb_ips.txt -m massweb -w airbnbtestweb
-```
-
-#### RPI Copy:
-```
-scp -P 7 /root/Desktop/test.txt root@192.168.0.12:/root
-```
 
 #### use Gotty - https://github.com/yudai/gotty
 
