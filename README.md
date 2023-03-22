@@ -110,7 +110,7 @@ cp ~/$projectname/params/all.txt | sed 's/FUZZ/[whatever-you-like]/g' > ~/$proje
 #### Nuclei
 for scanning everything:
 ```bash
-nuclei -l ~/$projectname/urls/urls.txt -o ~/$projectname/nucleai_cve_result.txt
+nuclei -l ~/$projectname/urls/urls.txt -o ~/$projectname/nucleai_all_result.txt
 ```
 for cve only:
 ```bash
