@@ -1,4 +1,4 @@
-# introduction:
+# Introduction:
 What you see here is an overview of how i approach reacon.
 
 ## Roadmap:
@@ -8,15 +8,20 @@ A((Project setup)) --> B(recon-ng)
 B --> C(isup)
 B --> D(nMap)
 B --> E(httpx)
+B --> F(Sn1per)
 ```
 
 ## Project setup
 Create Folders (subdomains, urls, ips,patterns,params,javascript). here is a good oneliner:
+```bash
+export projectname=[name]
+```
 ``` bash
-export projectname=[project_name] && mkdir $projectname && cd projectname && mkdir subdomains urls ips patterns params javascripts
+mkdir $projectname && cd projectname && mkdir subdomains urls ips patterns params javascripts
 ```
 
-## Recon-ng
+## Recon
+### Recon-ng
 install recon-ng. use it to search Passively for subdomains ips ports
 here are some of the commands you may need
 ```bash
@@ -34,21 +39,18 @@ db insert host
 # now load some modules and then run
 modules load recon/domai.....
 run
+
+# save the list 
 ```
 
-**UPLOAD ALL RESULTS INTO PLATFORM**
-
-> `Note`: If you see domain.* you have to use the below technique:
-
-TLD Wordlist:
-
-https://gist.githubusercontent.com/gingeleski/b01633b07183ff572198dd7e31bbd4b0/raw/5e015d43b4e7b692be49fb3f42f03e1693c370bb/domain_extensions_payloads.txt
-
-Ctrl+H with regex mode enabled and replace ^ with domainname
-
-Then Use :
-
-https://github.com/blackhatethicalhacking/Domain2IP-Converter
+#### Use Nmap Aggressive Scan:
+```bash
+nmap -iL ips.txt -sSV -A -T4 -O -Pn -v -F -oX $projectname_nmap_result.xml
+```
+#### Sn1per - WebApp Mode: 
+```bash
+sniper -f $projectname/ips/ips.txt -m massweb -w $projectname
+```
 
 Then Run subdomains using httpx for urls
 
@@ -58,17 +60,11 @@ For example when using a raspberry pi, or VPS it helps uploading files locally o
 
 ********************************************************************************************************************
 
-#### 5. Use Nmap Aggressive Scan & Save to XML to Import into Bounty Platform:
 
-```
-nmap -iL ips.txt -sSV -A -T4 -O -Pn -v -F -oX nmap2.xml
-```
 
-Extra Sn1per - WebApp Mode: 
 
-```
-sniper -f /root/Desktop/Bounty/Airbnb/ips/valid-airbnb_ips.txt -m massweb -w airbnbtestweb
-```
+
+
 **UPLOAD ALL RESULTS INTO PLATFORM**
 
 Examine Some Services Manually from the Cloud Platform Hive: New!
@@ -418,3 +414,4 @@ https://github.com/Black-Hat-Ethical-Hacking/log4j-scan
 https://github.com/j3ssie/osmedeus
 35) getJS
 https://github.com/003random/getJS
+
