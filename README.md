@@ -9,6 +9,7 @@ B --> C(isup)
 C --> D(nMap)
 C --> F(Sn1per)
 B --> E(httpx)
+E --> K(paramspider)
 E --> G(Eyewitness)
 B --> H(osmedeous)
 B --> I(Heartbleed)
@@ -25,7 +26,7 @@ mkdir ~/$projectname && cd ~/$projectname && mkdir subdomains urls ips patterns 
 ```
 
 ## Recon
-### Recon-ng
+### 1. Recon-ng
 install recon-ng. use it to search Passively for subdomains ips ports
 here are some of the commands you may need
 ```bash
@@ -60,23 +61,23 @@ now make sure you are in your working directory:
 cd ~/$projectname
 ```
 
-#### Check if ips are alive:
+#### 2. Check if ips are alive:
 check if ips are alive using isup.
 ```bash
 cd ~/isup && rm tmp -R &&./isup.sh ~/$projectname/ips/ips.txt && cp ~/isup/tmp/valid-ips.txt ~/$projectname/ips/valid-ips.txt
 ```
 
-#### Validate subdomains:
+#### 3. Validate subdomains:
 validate domains using httpx:
 ```bash
 cat ~/$projectname/subdomains/subdomains.txt | httpx -verbose > ~/$projectname/urls/urls.txt
 ```
 
-#### Use Nmap Aggressive Scan:
+#### 4. Use Nmap Aggressive Scan:
 ```bash
 nmap -iL ~/$projectname/ips/valid-ips.txt -sSV -A -T4 -O -Pn -v -F -oX $projectname_nmap_result.xml
 ```
-#### Sn1per - WebApp Mode: 
+#### 5. Sn1per - WebApp Mode: 
 ```bash
 sniper -f ~/$projectname/ips/ips.txt -m massweb -w $projectname
 ```
@@ -85,7 +86,7 @@ then save the result and copy them to our working folder!
 # complete this
 ```
 
-#### Eyewitness to take Screenshots of all URLS
+#### 6. Eyewitness to take Screenshots of all URLS
 ```bash
 cd ~/$projectname/ && eyewitness -f ~/$projectname/urls/urls.txt
 ```
@@ -93,7 +94,20 @@ cd ~/$projectname/ && eyewitness -f ~/$projectname/urls/urls.txt
 zip -r $projectname.zip foldername
 ```
 
-#### Nuclei
+#### 7. ParamSpider 
+to Hunt for URLS with Parameters automatically from wayback machine
+```bash 
+cat ~/$projectname/urls/urls.txt | while IFS="" read -r p || [ -n "$p" ] 
+do 
+	python3 ~/ParamSpider/paramspider.py --domain "$p" --exclude woff,png,svg,php,jpg --output ~/$projectname/params/$(echo $p | sed 's/https:\/\///g ; s/http:\/\///g').txt 
+done && cat ~/$projectname/params/* > ~/$projectname/params/all.txt
+```
+Technique to Clean Params from XSS:
+```bash
+cp ~/$projectname/params/all.txt | sed 's/FUZZ/[whatever-you-like]/g' > ~/$projectname/params/all-changed.txt 
+```
+
+#### 8. Nuclei
 for scanning everything:
 ```bash
 nuclei -l ~/$projectname/urls/urls.txt -o ~/$projectname/nucleai_cve_result.txt
@@ -103,23 +117,36 @@ for cve only:
 nuclei -l ~/$projectname/urls/urls.txt -t /root/nuclei-templates/cves/ -o ~/$projectname/nucleai-cve-result.txt
 ```
 
-#### Jaeles:
+#### 9. Jaeles:
 ```bash
 cat ~/$projectname/urls/urls.txt | jaeles scan -s 'cves' -s 'sensitive' -s 'fuzz' -s ‘common' -s 'routines' report -o ~/$projectname/Jaeles-cve-result.txt --title "[$projectname] Jaeles Full Report"
 ```
 
-#### chopchop 
+#### 10. chopchop 
 
 ```bash
 ~/ChopChop/gochopchop scan --url-file ~/$projectname/urls/urls.txt --threads 4 -e csv --export-filename ~/$projectname/chopchop-result.txt
 ```
 
-#### inception
+#### 11. inception
 ```bash
 # write this
 ```
 
-#### use osmedeous to search for vulenerablities: 
+#### 12. download all of the javascripts
+Gau - for realtime URL extraction when performing manual search so you can have urls to attack. Hunt for Links that have Parameters by using gau (Get all URLS) and displaying all links that have params: 
+```bash
+# this might need some work
+./gau --blacklist png,jpg,gif ~/$projectname/urls/urls.txt --o ~/$projectname/urls/urls-gau.txt --verbose
+```
+
+#### 12. download all of the javascripts with JSScanner 
+first download everything:
+```bash
+~/JSScanner/script.sh  ~/$projectname/params/all.txt && cp  Jsscanner_results/ ~/$projectname/javascripts -r
+```
+
+#### 13. Osmedeous, search for vulenerablities: 
 Select one of these actions
 directly run on vuln scan and directory scan on list of domains :
 ```bash
@@ -148,67 +175,15 @@ then save the result and copy them to our working folder!
 cat ~/$projectname/subdomains/subdomains.txt | while read line ; do echo "QUIT" | openssl s_client -connect $line:443 2>&1 | grep 'server extension "heartbeat" (id=15)' || echo $line: safe; done
 ```
 
-Extract Javascripts from domains, and fetch only the URLS from those big files, can also be used with any type of file containing huge data:
-
-First use getJs to get the Javascripts:
-
-```
-getJS --url website.com --output /root/results.txt
-```
-
-```
-getJS --input urls.txt --output /root/results.txt
-```
-
-Extract URLs directly or from a file using this one-liner:
-
-From any type of file:
-```
-cat file | grep -Eo "(http|https)://[a-zA-Z0-9./?=_-]*"*
-```
-
-Directly from a website:
-```
-curl https://domain.xx/file.js | grep -Eo "(http|https)://[a-zA-Z0-9./?=_-]*"*
-```
-
-OSINT: (Can be done on RPI)
-
-Check for Domain TakeOver with Takeover by M4llok 
-
-Takeover Tool: 
-```
+#### Takeover Tool: 
+```bash
 takeover -l sub_domains.txt -v -t 10
 ```
-
-**Check for open Amazon S3 buckets
-```
-ls | grep s3 from nuclei-templates/technologies
-```
-
-Can use nuclei -l urls.txt -t /root/nuclei-templates/technologies/s3-detect.yaml
-
-Attack Buckets: New!
-
-https://github.com/blackhatethicalhacking/s3-buckets-aio-pwn
-
-6. Use ParamSpider to Hunt for URLS with Parameters automatically from wayback machine - You can also use Arjun, we are switching to ParamSpider as part of building a workflow 
-
-```
-python3 paramspider.py --domain DOMAINNAME.com --exclude woff,png,svg,php,jpg --output /root/Desktop/Bounty/params.txt
-```
-
-Technique to Clean Params from XSS:
-
-```
-sed 's/unix/linux/g' reconfile.txt
-```
  
-7. Use Smuggler on URLs list to test for http requests that could desync, and posting multiple chunked requests to smuggle external sources so the backend server will forward the request with cookies, data to the front end server
-   
-(Can be done on RPI)
+#### Use Smuggler
+on URLs list to test for http requests that could desync, and posting multiple chunked requests to smuggle external sources so the backend server will forward the request with cookies, data to the front end server
 
-```
+```bash
 cat list_of_urls.txt | python3 smuggler.py -l /root/location.txt
 ```
 
@@ -241,32 +216,8 @@ sed 's/FUZZ//g' reconfile.txt
 meg -v LFI-gracefulsecurity-linux.txt /root/Desktop/Bounty/urls.txt /root/Desktop/urls.txt -s 200
 ```
 
-9. JSScanner: 
 
-Scanning Javascript Files for Endpoints, Secrets, Hardcoded credentials,IDOR, Openredirect and more
 
-Paste URLS into `alive.txt`
-
-Run script `alive.txt` - Examine the results using GF advanced patterns
-
-Use tree command, cat into subdirectories:
-```
-cat * */*.txt
-cat */*.js | gf api-keys	
-cat /*/*.txt | gf ssrf > /root/Desktop/ssrf.txt
-```
-
-Or New Method with GitLeaks: New!
-
-Scan a Directory with Javascripts, Files, Json Etc.. for Secrets!
-```
-gitleaks --path=/directory -v --no-git
-```
-
-Scan a File with Any Extension for Secrets!
-```
-gitleaks --path=/file.xxx -v --no-git
-```
  
 10. Find XSS Vulnerabilities from Paramspider & Dalfox New!
 
@@ -295,7 +246,29 @@ For Deeper Attacks add this:
 
 Silence --silence Prints only PoC When found and progress
 
-10 - After Recon: New!
+## After recon
+Scanning Javascript Files for Endpoints, Secrets, Hardcoded credentials, IDOR, Open redirect and more Paste URLS into `alive.txt`. Run script `alive.txt` - Examine the results using GF advanced patterns
+
+Use tree command, cat into subdirectories:
+```
+cat * */*.txt
+cat */*.js | gf api-keys	
+cat /*/*.txt | gf ssrf > /root/Desktop/ssrf.txt
+```
+
+Or New Method with GitLeaks: New!
+
+Scan a Directory with Javascripts, Files, Json Etc.. for Secrets!
+```
+gitleaks --path=/directory -v --no-git
+```
+
+Scan a File with Any Extension for Secrets!
+```
+gitleaks --path=/file.xxx -v --no-git
+```
+
+#### After Recon: New!
 
 When you find Keys/Tokens - Check from here: https://github.com/streaak/keyhacks
 
@@ -316,30 +289,6 @@ One off 1337 Powerful Command Attacks with amass:
 
 ```
 gotty -p 1337 -w recon-ng 
-```
-
-Gau - for realtime URL extraction when performing manual search so you can have urls to attack.
-
-Hunt for Links that have Parameters by using gau (Get all URLS) and displaying all links that have params: 
-
-```
-cat subdomains.txt | gau | tee /root/Desktop/urls.txt | lolcat
-```
-
-```
-gau domains -o urls.txt
-```
-
-```
-gau example.com
-```
-
-```
-gau -o example-urls.txt example.com
-```
-
-```
-gau -b png,jpg,gif example.com
 ```
 
 # Tools
