@@ -22,11 +22,11 @@ Create Folders (subdomains, urls, ips,patterns,params,javascript). here is a goo
 export projectname=[name]
 ```
 ``` bash
-mkdir ~/$projectname && cd ~/$projectname && mkdir subdomains urls ips patterns params javascripts
+mkdir ~/$projectname && cd ~/$projectname && mkdir subdomains urls ips patterns params javascripts downloads
 ```
 
 ## Recon
-### 1. Recon-ng
+#### Recon-ng
 install recon-ng. use it to search Passively for subdomains ips ports
 here are some of the commands you may need
 ```bash
@@ -61,23 +61,23 @@ now make sure you are in your working directory:
 cd ~/$projectname
 ```
 
-#### 2. Check if ips are alive:
+#### Check if ips are alive:
 check if ips are alive using isup.
 ```bash
 cd ~/isup && rm tmp -R &&./isup.sh ~/$projectname/ips/ips.txt && cp ~/isup/tmp/valid-ips.txt ~/$projectname/ips/valid-ips.txt
 ```
 
-#### 3. Validate subdomains:
+#### Validate subdomains:
 validate domains using httpx:
 ```bash
 cat ~/$projectname/subdomains/subdomains.txt | httpx -verbose > ~/$projectname/urls/urls.txt
 ```
 
-#### 4. Use Nmap Aggressive Scan:
+#### Use Nmap Aggressive Scan:
 ```bash
 nmap -iL ~/$projectname/ips/valid-ips.txt -sSV -A -T4 -O -Pn -v -F -oX $projectname_nmap_result.xml
 ```
-#### 5. Sn1per - WebApp Mode: 
+#### Sn1per - WebApp Mode: 
 ```bash
 sniper -f ~/$projectname/ips/ips.txt -m massweb -w $projectname
 ```
@@ -86,7 +86,7 @@ then save the result and copy them to our working folder!
 # complete this
 ```
 
-#### 6. Eyewitness to take Screenshots of all URLS
+#### Eyewitness to take Screenshots of all URLS
 ```bash
 cd ~/$projectname/ && eyewitness -f ~/$projectname/urls/urls.txt
 ```
@@ -94,7 +94,7 @@ cd ~/$projectname/ && eyewitness -f ~/$projectname/urls/urls.txt
 zip -r $projectname.zip foldername
 ```
 
-#### 7. ParamSpider 
+#### ParamSpider 
 to Hunt for URLS with Parameters automatically from wayback machine
 ```bash 
 cat ~/$projectname/urls/urls.txt | while IFS="" read -r p || [ -n "$p" ] 
@@ -107,7 +107,7 @@ Technique to Clean Params from XSS:
 cp ~/$projectname/params/all.txt | sed 's/FUZZ/[whatever-you-like]/g' > ~/$projectname/params/all-changed.txt 
 ```
 
-#### 8. Nuclei
+#### Nuclei
 for scanning everything:
 ```bash
 nuclei -l ~/$projectname/urls/urls.txt -o ~/$projectname/nucleai_cve_result.txt
@@ -117,36 +117,44 @@ for cve only:
 nuclei -l ~/$projectname/urls/urls.txt -t /root/nuclei-templates/cves/ -o ~/$projectname/nucleai-cve-result.txt
 ```
 
-#### 9. Jaeles:
+#### Jaeles:
 ```bash
 cat ~/$projectname/urls/urls.txt | jaeles scan -s 'cves' -s 'sensitive' -s 'fuzz' -s ‘common' -s 'routines' report -o ~/$projectname/Jaeles-cve-result.txt --title "[$projectname] Jaeles Full Report"
 ```
 
-#### 10. chopchop 
+#### chopchop 
 
 ```bash
 ~/ChopChop/gochopchop scan --url-file ~/$projectname/urls/urls.txt --threads 4 -e csv --export-filename ~/$projectname/chopchop-result.txt
 ```
 
-#### 11. inception
+#### inception
 ```bash
 # write this
 ```
 
-#### 12. download all of the javascripts
+#### get all urls
 Gau - for realtime URL extraction when performing manual search so you can have urls to attack. Hunt for Links that have Parameters by using gau (Get all URLS) and displaying all links that have params: 
 ```bash
 # this might need some work
 ./gau --blacklist png,jpg,gif ~/$projectname/urls/urls.txt --o ~/$projectname/urls/urls-gau.txt --verbose
 ```
 
-#### 12. download all of the javascripts with JSScanner 
+#### download all of the javascripts with JSScanner 
 first download everything:
 ```bash
 ~/JSScanner/script.sh  ~/$projectname/params/all.txt && cp  Jsscanner_results/ ~/$projectname/javascripts -r
 ```
 
-#### 13. Osmedeous, search for vulenerablities: 
+#### download pdf,xls,docs files
+```bash 
+cat ~/$projectname/urls/urls.txt | while IFS="" read -r p || [ -n "$p" ] 
+do 
+	proxychains python3 ~/metagoofil/metagoofil.py -d $p -t pdf,doc,xls,ppt,docs,xls,pptx -e 30 -l 12 -o ~/$projectname/downloads/
+done
+```
+
+#### Osmedeous, search for vulenerablities: 
 Select one of these actions
 directly run on vuln scan and directory scan on list of domains :
 ```bash
@@ -331,3 +339,5 @@ https://github.com/Black-Hat-Ethical-Hacking/log4j-scan
 https://github.com/j3ssie/osmedeus
 35) getJS
 https://github.com/003random/getJS
+36) MetaGoofil
+https://github.com/opsdisk/metagoofil
