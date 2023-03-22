@@ -75,7 +75,7 @@ cat ~/$projectname/subdomains/subdomains.txt | httpx -verbose > ~/$projectname/u
 
 #### Use Nmap Aggressive Scan:
 ```bash
-nmap -iL ~/$projectname/ips/valid-ips.txt -sSV -A -T4 -O -Pn -v -F -oX $projectname_nmap_result.xml
+nmap -iL ~/$projectname/ips/valid-ips.txt -sSV -A -T4 -O -Pn -v -F -oX  ~/$projectname/$projectname_nmap_result.xml
 ```
 #### Sn1per - WebApp Mode: 
 ```bash
