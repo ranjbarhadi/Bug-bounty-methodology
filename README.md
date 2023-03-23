@@ -192,7 +192,7 @@ takeover -l ~/$projectname/subdomains/subdomains.txt -v -t 10
 on URLs list to test for http requests that could desync, and posting multiple chunked requests to smuggle external sources so the backend server will forward the request with cookies, data to the front end server
 
 ```bash
-cat ~/$projectname/urls/urls.txt | python3 smuggler.py -l ~/$projectname/smuggler-result.txt
+cat ~/$projectname/urls/urls.txt | python3 ~/smuggler/smuggler.py -l ~/$projectname/smuggler-result.txt
 ```
  
 #### Find XSS Vulnerabilities from Paramspider & Dalfox New!
