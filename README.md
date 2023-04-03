@@ -77,11 +77,11 @@ cat ~/$projectname/subdomains/subdomains.txt | httpx -verbose > ~/$projectname/u
 always use ffuf 1.5 
 this will fuzz for files in the main directory
 ```bash
-for url in $(<~/$projectname/urls/urls.txt); do ( ffuf -u "${URL}/FUZZ" -w /root/SecLists/Discovery/Web-Content/raft-large-files-lowercase.txt -ic -c -of all -o ~/$projectname/ffuf/$(echo $URL | sed 's/https:\/\///g ; s/http:\/\///g')); done
+for URL in $(<~/$projectname/urls/urls.txt); do ( ffuf -u "${URL}/FUZZ" -w /root/SecLists/Discovery/Web-Content/raft-large-files-lowercase.txt -ic -c -of all -o ~/$projectname/ffuf/$(echo $URL | sed 's/https:\/\///g ; s/http:\/\///g')); done
 ```
 this will fuzz for directories:
 ```bash
-for url in $(<~/$projectname/urls/urls.txt); do ( ffuf -u "${URL}/FUZZ" -w /root/SecLists/Discovery/Web-Content/raft-medium-directories-lowercase.txt -ic -c -recursion -recursion-depth 3 -of all -o ~/$projectname/ffuf/$(echo $URL | sed 's/https:\/\///g ; s/http:\/\///g')); done
+for URL in $(<~/$projectname/urls/urls.txt); do ( ffuf -u "${URL}/FUZZ" -w /root/SecLists/Discovery/Web-Content/raft-medium-directories-lowercase.txt -ic -c -recursion -recursion-depth 3 -of all -o ~/$projectname/ffuf/$(echo $URL | sed 's/https:\/\///g ; s/http:\/\///g')); done
 ```
 
 #### Use Nmap Aggressive Scan:
