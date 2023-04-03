@@ -22,7 +22,7 @@ Create Folders (subdomains, urls, ips,patterns,params,javascript). here is a goo
 export projectname=[name]
 ```
 ``` bash
-mkdir ~/$projectname && cd ~/$projectname && mkdir subdomains urls ips patterns params javascripts downloads
+mkdir ~/$projectname && cd ~/$projectname && mkdir subdomains urls ips patterns params javascripts downloads ffuf
 ```
 
 ## Recon
@@ -71,6 +71,17 @@ cd ~/isup && rm tmp -R &&./isup.sh ~/$projectname/ips/ips.txt && cp ~/isup/tmp/v
 validate domains using httpx:
 ```bash
 cat ~/$projectname/subdomains/subdomains.txt | httpx -verbose > ~/$projectname/urls/urls.txt
+```
+
+#### Fuzzing for directories and files
+always use ffuf 1.5 
+this will fuzz for files in the main directory
+```bash
+for url in $(<~/$projectname/urls/urls.txt); do ( ffuf -u "${URL}/FUZZ" -w /root/SecLists/Discovery/Web-Content/raft-large-files-lowercase.txt -ic -c -of all -o ~/$projectname/ffuf/$(echo $URL | sed 's/https:\/\///g ; s/http:\/\///g')); done
+```
+this will fuzz for directories:
+```bash
+for url in $(<~/$projectname/urls/urls.txt); do ( ffuf -u "${URL}/FUZZ" -w /root/SecLists/Discovery/Web-Content/raft-medium-directories-lowercase.txt -ic -c -recursion -recursion-depth 3 -of all -o ~/$projectname/ffuf/$(echo $URL | sed 's/https:\/\///g ; s/http:\/\///g')); done
 ```
 
 #### Use Nmap Aggressive Scan:
