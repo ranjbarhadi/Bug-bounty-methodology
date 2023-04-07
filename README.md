@@ -48,11 +48,11 @@ run
 # save the list 
 modules load reporting/list
 # save ip addresses
-options set FILENAME ~/$projectname/ips/ips.txt
+options set FILENAME /root/$projectname/ips/ips.txt
 run
 # save domains
 options set COLUMN host
-options set FILENAME ~/$projectname/subdomains/subdomains.txt
+options set FILENAME /root/$projectname/subdomains/subdomains.txt
 run
 ```
 
