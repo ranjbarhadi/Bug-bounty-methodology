@@ -30,16 +30,16 @@ mkdir ~/$projectname && cd ~/$projectname && mkdir subdomains urls ips patterns 
 install recon-ng. use it to search Passively for subdomains ips ports
 here are some of the commands you may need
 ```bash
-workspaces create
+workspaces create [workspace_name]
 
 #insert domains
-db insert domain
+db insert domains
 
 #insert company name
-db insert company
+db insert companies
 
 # if you have a narrow scope you can enter the hosts using this command
-db insert host
+db insert hosts
 
 # now load some modules and then run
 modules load recon/domai.....
