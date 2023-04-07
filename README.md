@@ -90,7 +90,7 @@ nmap -iL ~/$projectname/ips/valid-ips.txt -sSV -A -T4 -O -Pn -v -F -oX  ~/$proje
 ```
 #### Sn1per - WebApp Mode: 
 ```bash
-sniper -f ~/$projectname/ips/ips.txt -m massweb -w $projectname && mkdir ~/$projectname/sniper && cp /usr/share/sniper/loot/workspace/judgeme ~/$projectname/sniper/ -R
+sniper -f ~/$projectname/ips/ips.txt -m massweb -w $projectname && mkdir ~/$projectname/sniper && cp /usr/share/sniper/loot/workspace/$projectname ~/$projectname/sniper/ -R
 ```
 then save the result and copy them to our working folder!
 ```bash
