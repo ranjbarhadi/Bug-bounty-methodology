@@ -86,7 +86,7 @@ for URL in $(<~/$projectname/urls/urls.txt); do ( ffuf -u "${URL}/FUZZ" -w /root
 
 #### Use Nmap Aggressive Scan:
 ```bash
-nmap -iL ~/$projectname/ips/valid-ips.txt -sSV -A -T4 -O -Pn -v -F -oX  ~/$projectname/"$projectname"_nmap_result.xml
+nmap -iL ~/$projectname/ips/valid-ips.txt -sSV -A -T4 -O -Pn -v -F -oA  ~/$projectname/"$projectname"_nmap_result
 ```
 #### Sn1per - WebApp Mode: 
 ```bash
